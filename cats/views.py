@@ -19,7 +19,7 @@ class MainView(LoginRequiredMixin, View):
         return render(request, 'cats/cat_list.html', ctx)
 
 
-class MakeView(LoginRequiredMixin, View):
+class BreedView(LoginRequiredMixin, View):
     def get(self, request):
         ml = Breed.objects.all()
         ctx = {'breed_list': ml}
@@ -28,7 +28,7 @@ class MakeView(LoginRequiredMixin, View):
 
 # We use reverse_lazy() because we are in "constructor attribute" code
 # that is run before urls.py is completely loaded
-class MakeCreate(LoginRequiredMixin, View):
+class BreedCreate(LoginRequiredMixin, View):
     template = 'cats/make_form.html'
     success_url = reverse_lazy('cats:all')
 
@@ -50,7 +50,7 @@ class MakeCreate(LoginRequiredMixin, View):
 # MakeUpdate has code to implement the get/post/validate/store flow
 # AutoUpdate (below) is doing the same thing with no code
 # and no form by extending UpdateView
-class MakeUpdate(LoginRequiredMixin, View):
+class BreedUpdate(LoginRequiredMixin, View):
     breed = Breed
     success_url = reverse_lazy('cats:all')
     template = 'cats/make_form.html'
@@ -92,19 +92,19 @@ class BreedDelete(LoginRequiredMixin, View):
 # These views do not need a form because CreateView, etc.
 # Build a form object dynamically based on the fields
 # value in the constructor attributes
-class AutoCreate(LoginRequiredMixin, CreateView):
+class CatCreate(LoginRequiredMixin, CreateView):
     model = Cat
     fields = '__all__'
     success_url = reverse_lazy('cats:all')
 
 
-class AutoUpdate(LoginRequiredMixin, UpdateView):
+class CatUpdate(LoginRequiredMixin, UpdateView):
     model = Cat
     fields = '__all__'
     success_url = reverse_lazy('cats:all')
 
 
-class AutoDelete(LoginRequiredMixin, DeleteView):
+class CatDelete(LoginRequiredMixin, DeleteView):
     model = Cat
     fields = '__all__'
     success_url = reverse_lazy('cats:all')
