@@ -5,7 +5,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 
 from cats.models import Cat, Breed
-from cats.forms import MakeForm
+from cats.forms import BreedForm
 
 # Create your views here.
 
@@ -29,41 +29,16 @@ class BreedView(LoginRequiredMixin, View):
 # We use reverse_lazy() because we are in "constructor attribute" code
 # that is run before urls.py is completely loaded
 class BreedCreate(LoginRequiredMixin, View):
-    template = 'cats/make_form.html'
+    template = 'cats/breed_form.html'
     success_url = reverse_lazy('cats:all')
 
     def get(self, request):
-        form = MakeForm()
+        form = BreedForm()
         ctx = {'form': form}
         return render(request, self.template, ctx)
 
     def post(self, request):
-        form = MakeForm(request.POST)
-        if not form.is_valid():
-            ctx = {'form': form}
-            return render(request, self.template, ctx)
-
-        breed = form.save()
-        return redirect(self.success_url)
-
-
-# MakeUpdate has code to implement the get/post/validate/store flow
-# AutoUpdate (below) is doing the same thing with no code
-# and no form by extending UpdateView
-class BreedUpdate(LoginRequiredMixin, View):
-    breed = Breed
-    success_url = reverse_lazy('cats:all')
-    template = 'cats/make_form.html'
-
-    def get(self, request, pk):
-        breed = get_object_or_404(self.model, pk=pk)
-        form = MakeForm(instance=breed)
-        ctx = {'form': form}
-        return render(request, self.template, ctx)
-
-    def post(self, request, pk):
-        breed = get_object_or_404(self.model, pk=pk)
-        form = MakeForm(request.POST, instance=breed)
+        form = BreedForm(request.POST)
         if not form.is_valid():
             ctx = {'form': form}
             return render(request, self.template, ctx)
@@ -72,18 +47,47 @@ class BreedUpdate(LoginRequiredMixin, View):
         return redirect(self.success_url)
 
 
+# MakeUpdate has code to implement the get/post/validate/store flow
+# AutoUpdate (below) is doing the same thing with no code
+# and no form by extending UpdateView
+'''class BreedUpdate(LoginRequiredMixin, View):
+    model = Breed
+    success_url = reverse_lazy('cats:all')
+    template = 'cats/breed_form.html'
+
+    def get(self, request, pk):
+        breed = get_object_or_404(self.model, pk=pk)
+        form = BreedForm(instance=breed)
+        ctx = {'form': form}
+        return render(request, self.template, ctx)
+
+    def post(self, request, pk):
+        breed = get_object_or_404(self.model, pk=pk)
+        form = BreedForm(request.POST, instance=breed)
+        if not form.is_valid():
+            ctx = {'form': form}
+            return render(request, self.template, ctx)
+
+        form.save()
+        return redirect(self.success_url)
+'''
+class BreedUpdate(LoginRequiredMixin, CreateView):
+    model = Breed
+    fields = '__all__'
+    success_url = reverse_lazy('cats:all')
+
 class BreedDelete(LoginRequiredMixin, View):
-    furball = Breed
+    model = Breed
     success_url = reverse_lazy('cats:all')
     template = 'cats/breed_confirm_delete.html'
 
     def get(self, request, pk):
-        breed = get_object_or_404(self.furball, pk=pk)
+        breed = get_object_or_404(self.model, pk=pk)
         ctx = {'breed': breed}
         return render(request, self.template, ctx)
 
     def post(self, request, pk):
-        breed = get_object_or_404(self.furball, pk=pk)
+        breed = get_object_or_404(self.model, pk=pk)
         breed.delete()
         return redirect(self.success_url)
 
